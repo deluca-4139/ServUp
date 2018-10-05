@@ -1,0 +1,50 @@
+-----------------------------------------------
+SERVER UPTIME MONITOR
+-----------------------------------------------
+
+This is a standalone server uptime monitor, designed and coded by Domenick De Luca (c/o '21).
+
+It was created to allow for modular testing of server uptime with SSH and HTTP ports (22 and 80) 
+to monitor server status.
+
+
+SYNOPSIS:
+
+The program works by looping through all desired servers - hostnames or IPs - and testing their
+response to a netcat connection. If it responds with an affirmative, the date and time is logged
+in a log file (in /logs) sorted by server. If the connection times out after 5 
+seconds when attempting a netcat connection, it logs the server as down and sends an email to a
+specified email address notifying that the server is down with the same date/time information.
+
+FILES:
+
+exec.sh: runs a for loop through each of the config files to run the correct testing script based
+on their ports (i.e. SSH vs HTTP). If you want to test a different port, you can copy/paste the for
+loop and just create a new config file with a new testing script.
+
+servup-*.cfg: CFG files that contain the list of servers (as said before, hostnames or IPs) that are
+being tested. Feel free to edit these and add or remove whatever servers you want to test.
+
+test_*.sh: these are the scripts that are run by ./exec.sh that take in a server name as an 
+argument and then test netcat connection. In them,
+they spawn a netcat connection and use expect to respond to the output. From this output, the
+scripts run another script to parse to a log file (and email if necessary). If you're creating a
+new one of these files to test for a different port, just change the port number in the line with
+spawn netcat (in the default files, these ports are either 22 for SSH or 80 for HTTP) as well as
+the lines that run the succeed.sh and timed_out.sh scripts, as the port number is a required
+argument for those scripts if you want the port number to be in the logs.
+
+succeeded.sh: takes in an argument for the server that needs to be logged and port that was tested.
+Outputs to a log file with parsed date and time (seen in the variable declarations at the top) that
+the server and port passed in were succesfully connected to (i.e. server is up). 
+
+timed_out.sh: takes in the same arguments as the previous script but outputs to a log that the 
+connection to the server timed out (i.e. that the server is down). It also sends an email alerting
+to this fact as specified in the synopsis. You can change the email address in the mail line to 
+whatever email address you want this mail to go to.
+
+USAGE:
+
+If there is not already one running, start a cron job to run ./exec.sh every 10 minutes or so. 
+I don't believe anything more often than 5 minutes is necessary. You can run the script manually if
+you want a realtime update of the server status. 
