@@ -47,4 +47,11 @@ USAGE:
 
 If there is not already one running, start a cron job to run ./exec.sh every 10 minutes or so. 
 I don't believe anything more often than 5 minutes is necessary. You can run the script manually if
-you want a realtime update of the server status. 
+you want a realtime update of the server status.
+
+If you've just cloned this, create a folder called logs/ and edit all the files that have _EDITME
+appended to them. It should be obvious what you'll need to change; read this file again if you 
+can't figure out what any of the files are supposed to be doing.
+
+If you've just cloned this, create a folder in here called logs/ and edit all the files that have
+_EDIT 
