@@ -43,13 +43,45 @@ connection to the server timed out (i.e. that the server is down). It also sends
 to this fact as specified in the synopsis. You can change the email address in the mail line to 
 whatever email address you want this mail to go to.
 
+logs/parse.sh: enters each of the log folders inside logs/ and, for every month in the year, tests
+to see if there are logs present for the current year in that month, and if so, iterates through 
+each of the log files from that month, creating a new file that contains the percentage of time 
+that the server was up that month for each day. This cuts down the amount of space required to 
+store a year's worth of logs from 1 file a day with one line every 10 minutes (or however long
+you have the cronjob set for) for every server to just one file a month with 28-31 lines per
+server. The parsing script is meant to be run once a month on the first of the month. The ability
+to parse through every month was just so that you can implement this script on your logs even if
+you've been collecting logs for a long time and still want to parse them; this script will be able
+to go through all your prior logs and parse them (at least, for the current or priot year. Minor
+modifications might be necessary for prior years, but it should be self explanatory). This script
+DOES NOT modify logs; only parse them and create new files. 
+
+logs/rotate.sh: enters each folder and creates a tar file containing all of the logs from the prior
+month (specifically yesterday's month, as seen in the script), moves that tar to a subfolder called
+parsed_logs/, and then deletes all those logs. This script is meant to be the companion script to 
+the above parse.sh; running parse.sh consolidates all the data from those logs to a smaller size, 
+and then rotate.sh actually compresses them and funnels the compressed logs away in case they are
+needed at a later date. This also facilitates easier deletion of the logs in the future. This 
+script is also meant to be ran once a month on the first of the month. Running it without command
+line arguments uses yesterday's month as the month for rotating (i.e. it tars and deletes last 
+month's logs). However, you can run it with command line arguments to choose the months for which
+you want to rotate data. For example, running it with the arguments "March September December"
+will check each log folder for logs that were made in the current year (or last year if running
+in January) in March, September, or December. If they exist, it rotates them as described above.
+If they do not exist, it does nothing. This facilitates easy rotation of many months of logs even
+if certain servers were not added at the same time and may not have similar amounts and dates of
+logged uptime. 
+
 USAGE:
 
 If there is not already one running, start a cron job to run ./exec.sh every 10 minutes or so. 
 I don't believe anything more often than 5 minutes is necessary. You can run the script manually if
-you want a realtime update of the server status.
+you want a realtime update of the server status. Cronjobs should also be added for logs/parse.sh 
+and logs/rotate.sh for the first of every month; I recommend 12:05 AM for parse.sh (so that it goes in between logging times, if you have the exec.sh cronjob set to run every 10 minutes) and 12:15 AM
+for rotate.sh so that it won't be running at the same time as anything else (though, you could have
+it run any time on the first, since it uses yesterday's month and year as the rotation data). 
 
-If you've just cloned this, create a folder called logs/ and edit all the files that have _EDITME
-appended to them. It should be obvious what you'll need to change; read this file again if you 
-can't figure out what any of the files are supposed to be doing.
+If you've just cloned this, edit all the files that have _EDITME appended to them. It should be 
+obvious what you'll need to change; read this file again if you can't figure out what any of the 
+files are supposed to be doing.
 
