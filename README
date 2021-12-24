@@ -2,7 +2,7 @@
 SERVER UPTIME MONITOR
 -----------------------------------------------
 
-This is a standalone server uptime monitor, designed and coded by Domenick De Luca (c/o '21).
+This is a standalone server uptime monitor, designed and coded by Nicole De Luca (c/o '21).
 
 It was created to allow for modular testing of server uptime with SSH and HTTP ports (22 and 80) 
 to monitor server status.
